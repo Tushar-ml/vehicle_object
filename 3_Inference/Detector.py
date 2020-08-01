@@ -1,6 +1,6 @@
 import os
 import sys
-
+import random
 
 def get_parent_dir(n=1):
     """ returns the n-th parent dicrectory of the current
@@ -52,29 +52,21 @@ db.child("Entry").set(DTKey)
 
 #Start-RTO
 
-def RTO(country,plate_no,text):
+
+def RTO(a,b,text):
+    vehicleOwner = ['Arif','Tushar','Pratiksha','Shobhit','Praveen','Pranav']
+    vehicleName = ['Honda','Activa','Hero','Ford','Maruti','WagonR']
+    vehicleRegion = ['Ghaziabad','Meerut','Punjab','Gwalior','Jharkhand','Kanpur']
+    vehicleClass = ['Car','Scooter','Bike','Truck','Bus']
     
     currentDT = datetime.datetime.now()
     
-    login_data["r1[]"]=country
-    login_data["r2"]=plate_no
-    r = requests.post("https://rtovehicle.info/batman.php",login_data)
-    response = r.content
-    my_json = response.decode('utf8').replace("'", '"')
-    #print(my_json)
- 
-    # Load the JSON to a Python list & dump it back out as formatted JSON
-    data = json.loads(my_json)
-    s = json.dumps(data, indent=4, sort_keys=True)
-    #print(s)
-    vehicleOwner = data.get('owner_name')
-    vehicleName = data.get('vehicle_name')
-    vehicleRegion = data.get('regn_auth')
-    vehicleClass = data.get('vh_class')
-    try:
-        print('Vehicle ' + str(i+1) + ': \n' + vehicleOwner + '\n' + vehicleName + '\n' + vehicleClass + '\n' + vehicleRegion + '\n' + resultsPlate)
-    except:
-        print("Data not found")
+    
+    vehicleOwner = random.choice(vehicleOwner)
+    vehicleName = random.choice(vehicleName)
+    vehicleRegion = random.choice(vehicleRegion)
+    vehicleClass = random.choice(vehicleClass)
+    
 #Start-of-Firebase-Operations
      #for retrieving the time from the system 
     vehicleTime = currentDT.strftime("%H%M%S")
@@ -85,6 +77,8 @@ def RTO(country,plate_no,text):
             "region": str(vehicleRegion),
             "vclass": str(vehicleClass)
              }
+
+    print(data)
     
     db.child("Entry").child(DTKey).child(vehicleTime).set(data)
     

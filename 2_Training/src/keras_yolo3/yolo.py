@@ -6,17 +6,17 @@ import os
 from timeit import default_timer as timer
 # import utils
 import pytesseract
-from .mouseclick import video_click
-from .yolo_sih import YOLO_Plate, detect_image_Plate
-from .Utils.utils import load_extractor_model, load_features, parse_input, detect_object
+from mouseclick import video_click
+from yolo_sih import YOLO_Plate, detect_image_Plate
+from Utils.utils import load_extractor_model, load_features, parse_input, detect_object
 import numpy as np
 from keras import backend as K
 from keras.models import load_model
 from keras.layers import Input
 from PIL import Image, ImageFont, ImageDraw
 import cv2
-from .yolo3.model import yolo_eval, yolo_body, tiny_yolo_body
-from .yolo3.utils import letterbox_image
+from yolo3.model import yolo_eval, yolo_body, tiny_yolo_body
+from yolo3.utils import letterbox_image
 import argparse
 import sys
 import pyrebase
@@ -47,29 +47,20 @@ db.child("Entry").set(DTKey)
 login_data={"r1[]":"PB22G",
             "r2":"4565",
             "auth":"Y29tLmRlbHVzaW9uYWwudmVoaWNsZWluZm8="}
-def RTO(country,plate_no,text):
+def RTO(a,b,text):
+    vehicleOwner = ['Arif','Tushar','Pratiksha','Shobhit','Praveen','Pranav']
+    vehicleName = ['Honda','Activa','Hero','Ford','Maruti','WagonR']
+    vehicleRegion = ['Ghaziabad','Meerut','Punjab','Gwalior','Jharkhand','Kanpur']
+    vehicleClass = ['Car','Scooter','Bike','Truck','Bus']
     
     currentDT = datetime.datetime.now()
     
-    login_data["r1[]"]=country
-    login_data["r2"]=plate_no
-    r = requests.post("https://rtovehicle.info/batman.php",login_data)
-    response = r.content
-    my_json = response.decode('utf8').replace("'", '"')
-    #print(my_json)
- 
-    # Load the JSON to a Python list & dump it back out as formatted JSON
-    data = json.loads(my_json)
-    s = json.dumps(data, indent=4, sort_keys=True)
-    #print(s)
-    vehicleOwner = data.get('owner_name')
-    vehicleName = data.get('vehicle_name')
-    vehicleRegion = data.get('regn_auth')
-    vehicleClass = data.get('vh_class')
-    try:
-        print('Vehicle ' + str(i+1) + ': \n' + vehicleOwner + '\n' + vehicleName + '\n' + vehicleClass + '\n' + vehicleRegion + '\n' + resultsPlate)
-    except:
-        print("Data not found")
+    
+    vehicleOwner = random.choice(vehicleOwner)
+    vehicleName = random.choice(vehicleName)
+    vehicleRegion = random.choice(vehicleRegion)
+    vehicleClass = random.choice(vehicleClass)
+    
 #Start-of-Firebase-Operations
      #for retrieving the time from the system 
     vehicleTime = currentDT.strftime("%H%M%S")
@@ -80,6 +71,8 @@ def RTO(country,plate_no,text):
             "region": str(vehicleRegion),
             "vclass": str(vehicleClass)
              }
+
+    print(data)
     
     db.child("Entry").child(DTKey).child(vehicleTime).set(data)
 def get_parent_dir(n=1):
@@ -369,15 +362,16 @@ class YOLO(object):
         )
         thickness = (image.size[0] + image.size[1]) // 300
         plate_prediction,image = detect_image_Plate(yolo_plate,image,show_stats=False)
-        
+        pred_class = []
         for i, c in reversed(list(enumerate(out_classes))):
             
             if self.class_names[c]=='car' or self.class_names[c]=='motorbike' or self.class_names[c]=='truck' or self.class_names[c]=='bus' :
                 
                 predicted_class = self.class_names[c]
+                pred_class.append(predicted_class)
                 box = out_boxes[i]
                 score = out_scores[i]
-                if score>0.92:
+                if score>0.8:
                     
                     label = "{} {:.2f}".format(predicted_class, score)
                     draw = ImageDraw.Draw(image)
@@ -430,7 +424,7 @@ class YOLO(object):
         end = timer()
         '''if show_stats:
             print("Time spent: {:.3f}sec".format(end - start))'''
-        return tracking_box,plate_prediction, image
+        return pred_class,tracking_box,plate_prediction, image
     
     
 
@@ -502,7 +496,7 @@ def detect_video(yolo, video_path, output_path=""):
         # opencv images are BGR, translate to RGB
         frame = frame[:, :, ::-1]
         image = Image.fromarray(frame)
-        out_pred,car_plate, image = yolo.detect_image(image, show_stats=False)
+        predicted_class,out_pred,car_plate, image = yolo.detect_image(image, show_stats=False)
         x,image = detect_image_Plate(yolo_plate,image,show_stats=False)
         image = np.asarray(image)
         if len(out_pred)!=0: 
@@ -527,7 +521,7 @@ def detect_video(yolo, video_path, output_path=""):
                                 
                               
                                 
-                                if score_plate>0.8:
+                                if score_plate>0.6:
                                     roi = frame[top_plate:bottom_plate,left_plate:right_plate]
                                     cv2.imwrite('C:/Users/TusharGoel/Desktop/Extracted_Plate/savedPlate.png'.format(j),roi)
                                     img = cv2.imread('C:/Users/TusharGoel/Desktop/Extracted_Plate/savedPlate.png')

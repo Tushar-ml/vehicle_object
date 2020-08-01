@@ -1,10 +1,9 @@
 import time
 import cv2
-mousePoints = list()
-convexPoints = []    
+mousePoints = list()    
 
 def video_click(videopath):
-    capture_time = 10
+    capture_time = 20
     cap = cv2.VideoCapture(videopath)
     start_time = time.time()
    
@@ -17,7 +16,7 @@ def video_click(videopath):
                 global convexPoints
                 if event==cv2.EVENT_LBUTTONDOWN:
                     mousePoints.append((x,y))
-                    convexPoints.append([x,y])
+                    
         cv2.setMouseCallback('result',mouseClick)
         # print(mousePoints)
         # cv2.namedWindow("result", cv2.WINDOW_NORMAL)
