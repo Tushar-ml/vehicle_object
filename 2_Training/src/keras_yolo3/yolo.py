@@ -6,20 +6,20 @@ import os
 from timeit import default_timer as timer
 # import utils
 import pytesseract
-from mouseclick import video_click
-from yolo_sih import YOLO_Plate, detect_image_Plate
-from Utils.utils import load_extractor_model, load_features, parse_input, detect_object
+from .mouseclick import video_click
+from .yolo_sih import YOLO_Plate, detect_image_Plate
+from .Utils.utils import load_extractor_model, load_features, parse_input, detect_object
 import numpy as np
 from keras import backend as K
 from keras.models import load_model
 from keras.layers import Input
 from PIL import Image, ImageFont, ImageDraw
 import cv2
-from yolo3.model import yolo_eval, yolo_body, tiny_yolo_body
-from yolo3.utils import letterbox_image
+from .yolo3.model import yolo_eval, yolo_body, tiny_yolo_body
+from .yolo3.utils import letterbox_image
 import argparse
 import sys
-# import pyrebase
+import pyrebase
 from keras.utils import multi_gpu_model
 import re
 pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesseract.exe'
@@ -33,17 +33,17 @@ config = {
   "authDomain": "vechiledetection",
   "databaseURL": "https://vechiledetection.firebaseio.com/",
   "storageBucket": "gs://vechiledetection.appspot.com",
-  "serviceAccount": "D:/LicensePlateWithYOLO/db/vechiledetection-firebase-adminsdk-kiblg-ddb38b4b7f.json"
+  "serviceAccount": "C:/Users/TusharGoel/Desktop/Vehicle Object Tracking/db/vechiledetection-firebase-adminsdk-kiblg-ddb38b4b7f.json"
 }
-# firebase = pyrebase.initialize_app(config)
+firebase = pyrebase.initialize_app(config)
 
-# db = firebase.database()
+db = firebase.database()
 
 currentDTKey = datetime.datetime.now() #For retreiving the key from The system date
 
 DTKey = currentDTKey.strftime("%d%m%Y")
 
-'''db.child("Entry").set(DTKey)
+db.child("Entry").set(DTKey)
 login_data={"r1[]":"PB22G",
             "r2":"4565",
             "auth":"Y29tLmRlbHVzaW9uYWwudmVoaWNsZWluZm8="}
@@ -81,7 +81,7 @@ def RTO(country,plate_no,text):
             "vclass": str(vehicleClass)
              }
     
-    db.child("Entry").child(DTKey).child(vehicleTime).set(data)'''
+    db.child("Entry").child(DTKey).child(vehicleTime).set(data)
 def get_parent_dir(n=1):
     """ returns the n-th parent dicrectory of the current
         working directory """
@@ -529,8 +529,8 @@ def detect_video(yolo, video_path, output_path=""):
                                 
                                 if score_plate>0.8:
                                     roi = frame[top_plate:bottom_plate,left_plate:right_plate]
-                                    cv2.imwrite('C:/Users/TusharGoel/Desktop/results/savedPlate.png'.format(j),roi)
-                                    img = cv2.imread('C:/Users/TusharGoel/Desktop/results/savedPlate.png')
+                                    cv2.imwrite('C:/Users/TusharGoel/Desktop/Extracted_Plate/savedPlate.png'.format(j),roi)
+                                    img = cv2.imread('C:/Users/TusharGoel/Desktop/Extracted_Plate/savedPlate.png')
                                     
                                     
                                     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -553,7 +553,7 @@ def detect_video(yolo, video_path, output_path=""):
                                     cv2.imshow("im_dil",img_dilate)
                                     config = ('-l eng+hin --oem 1 --psm 3')
                                     text = pytesseract.image_to_string(img_dilate,config=config)
-                                    # Lets Filter the text
+                                    print('License Plate Recognised: {}'.format(text))
                                     data = set()
                                     data.add(plate_no_recognizer(text))
                                     if len(data)!=0:

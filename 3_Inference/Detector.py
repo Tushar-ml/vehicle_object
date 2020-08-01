@@ -30,14 +30,14 @@ from Get_File_Paths import GetFileList
 import random
 import json
 import requests
-# import pyrebase
+import pyrebase
 import datetime
-'''config = {
+config = {
   "apiKey": "AIzaSyDaYILIFsZWzCl54rbQQMrGT5ET3o8Yj6U",
   "authDomain": "vechiledetection",
   "databaseURL": "https://vechiledetection.firebaseio.com/",
   "storageBucket": "gs://vechiledetection.appspot.com",
-  "serviceAccount": "C:/Users/ARIF/Desktop/LicensePlateWithYOLO/db/serviceAccountCredentials.json"
+  "serviceAccount": "C:/Users/TusharGoel/Desktop/Vehicle Object Tracking/db/vechiledetection-firebase-adminsdk-kiblg-ddb38b4b7f.json"
 }
 firebase = pyrebase.initialize_app(config)
 
@@ -86,7 +86,7 @@ def RTO(country,plate_no,text):
             "vclass": str(vehicleClass)
              }
     
-    db.child("Entry").child(DTKey).child(vehicleTime).set(data)'''
+    db.child("Entry").child(DTKey).child(vehicleTime).set(data)
     
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
@@ -349,11 +349,11 @@ if __name__ == "__main__":
             country_code = resultsPlate[:len(resultsPlate)-4]
             plate_number = resultsPlate[len(resultsPlate)-4:]
      
-            '''login_data={"r1[]":"PB22G",
+            login_data={"r1[]":"PB22G",
                 "r2":"4565",
                 "auth":"Y29tLmRlbHVzaW9uYWwudmVoaWNsZWluZm8="}
      
-            RTO(country_code,plate_number,resultsPlate)'''
+            RTO(country_code,plate_number,resultsPlate)
             cv2.waitKey(2000)
             cv2.destroyAllWindows()
             

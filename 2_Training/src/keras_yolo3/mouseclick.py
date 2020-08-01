@@ -4,7 +4,7 @@ mousePoints = list()
 convexPoints = []    
 
 def video_click(videopath):
-    capture_time = 20
+    capture_time = 10
     cap = cv2.VideoCapture(videopath)
     start_time = time.time()
    
